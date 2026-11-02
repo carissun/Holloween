@@ -1,89 +1,119 @@
-let bat = { x: 240, y: 180};
-let state = 'start';
-let score = 0;
-let duration = 9;
-let startTime;
+let img;
+let state = 'start'
+let y = 0;
+let count = 0;
+let t = 0;
+
 
 function setup() {
-    createCanvas(480,360);
-    startTime = millis();
+  img = loadImage('art/start.png');
+  createCanvas(480, 360);
+  angleMode('DEGREES');
+  rectMode('CENTER');
+  noStroke();
 }
 
-function draw() {  
-    background(15,10,25);
-    noStroke();
-    drawMoon();
-    drawGround();
-    drawDetails();
-    // start
-    if (state === 'start') {
-        fill(255);
-        textSize(30);
-        text("Click", 60,60);
-        return
+function draw() { 
+  if (state === 'start') {
+    start();
+  }
+
+  if (state === 'play') {
+    background(0);
+  }
+}
+
+function start() {
+    if (y > height) {
+        y= 0;
+        count ++;
     }
-    // over
-    if (state === 'over') {
-        fill(255);
-        textSize(30);
-        text("Game over, Click to Play", 50, 50 );
-        return
+
+    if (count >= 3) {
+      background(0);
+      t += randomGaussian(2, 1);
+      translate(0, height / 6);
+      testLetters();
     }
-    //possession
-    bat.x += random(-3,3);
-    bat.y += random(-3,3);
-    let elapsed = (millis() - startTime)/1000;
-    let timeLeft = max(0 , duration - elapsed)
-    if (timeLeft <= 0) {
-        state = 'over';
-        return
+     else {
+        stroke(0);
+        line(0, y, width, y );
+        background(img);
+        y++;
     }
-    drawBat(bat.x, bat.y);
-    fill(255);
-    textSize(16);
-    text("Score: " + score, 12,26);
-    text("Time: " + ceil(timeLeft), 12, 40);
-    
-}
-
-function drawBat(x, y) {
-    fill(255);
-    ellipse(x,y,10,10);
-    triangle(x-15,y,x-25,y-15,x-5,y+5);
-    triangle(x+15,y,x+25,y-15,x+5,y+5);
-}
-
-function drawMoon() {
-    fill(255,200,100);
-    ellipse(400,60,50,50);
-}
-
-function drawGround() {
-    fill(40,30,50);
-    ellipse(0,330,930,60);
-}
-
-function drawDetails() {
-    fill(255,0,0);
-    triangle(440,320,480,330,480,325);
-    fill(0,0,0);
-    triangle(270,360,480,360,480,325);
 }
 
 function mousePressed() {
-    if (state === 'start' || state === 'over') {
-        state = 'play';
-        score = 0;
-        startTime = millis();
-        drawBat();
-        return
-    }
+  state = 'play';
+}
 
-    if (dist(mouseX,mouseY, bat.x, bat.y) < 30) {
-        bat.x = random(10,width - 10);
-        bat.y = random(30,height - 30);
-        score++;
-        drawBat(bat.x , bat.y);
+function letters(l, w, r) {
+  push();
+  translate(0, w );
+  s = w /9 + randomGaussian(0, w /20);
 
-    }
+  fill(255 - random(30), 255 - random(30), 255 - random(10));
+  t1 = t + r + random(-20, 20);
+
+  if (l === "h") {
+    t2 = -90 + 90 * sin(t1);
+    circle((w / 3) * cos(t2), w / 2 + (w / 3) * sin(t2), s);
+    circle(-w / 2 + (w / 2 - w / 3), (w / 1.2) * sin(t1), s);
+    circle(w / 2 - (w / 2 - w / 3), w / 1.45 + (w / 6.5) * sin(t1), s);
+  }
+
+  if (l === "o") {
+    circle((w / 3) * cos(t1), w / 2 + (w / 3) * sin(t1), s);
+  }
+ 
+  if (l === "l") {
+    circle(0, (w / 1.2) * sin(t1), s);
+  }
+
+  if (l === "w") {
+    t2 = 90 + 90 * sin(t1);
+    circle(w / 4 + (w / 4) * cos(t2), w / 2 + (w / 3) * sin(t2), s);
+    circle(-w / 4 - (w / 4) * cos(t2), w / 2 + (w / 3) * sin(t2), s);
+    circle(w / 5.5 + w / 2 - (w / 2 - w / 3), w / 3 + (w / 6.5) * sin(t1), s);
+    circle(-w / 5.5 - w / 2 + (w / 2 - w / 3), w / 3 + (w / 6.5) * sin(t1), s);
+  }
+
+  if (l === "e") {
+    t2 = 190 - 140 * sin(t1);
+    circle((w / 3) * cos(t2), w / 2 + (w / 3) * sin(t2), s);
+    circle((-w / 4) * cos(t1), w / 3, s);
+  }
+  
+  if (l === "n") {
+    t2 = -90 + 90 * sin(t1);
+    circle((w / 3) * cos(t2), w / 2 + (w / 3) * sin(t2), s);
+    circle(-w / 2 + (w / 2 - w / 3), w / 2 + (w / 3) * sin(t1), s);
+    circle(w / 2 - (w / 2 - w / 3), w / 1.45 + (w / 6.5) * sin(t1), s);
+  }
+  pop();
+}
+
+function testLetters() {
+  w1 = 30;
+  w2 = w1 * 1.6;
+  push();
+  translate(50, 80);
+  letters("h", w1, 90);
+  translate(w2, 0);
+  letters("o", w1, 40);
+  translate(w2, 0);
+  letters("l", w1, 20);
+  translate(w2, 0);
+  letters("l", w1, 80);
+  translate(w2, 0);
+  letters("o", w1, 150);
+  translate(w2, 0);
+  letters("w", w1, 160);
+  translate(w2, 0);
+  letters("e", w1, 150);
+  translate(w2, 0);
+  letters("e", w1, 190);
+  translate(w2, 0);
+  letters("n", w1, 0);
+  pop();
 }
