@@ -1,5 +1,7 @@
-let img;
-let state = 'start'
+let startImg;
+let winImg;
+let loseImg;
+let state = 'start';
 let y = 0;
 let count = 0;
 let t = 0;
@@ -9,12 +11,16 @@ let bat_count = 0;
 let title_load;
 let startTime;
 let duration = 9;
+const synth = new Tone.Synth().toDestination();
+
 
 
 
 function setup() {
   title_load = false;
-  img = loadImage('art/start.png');
+  startImg = loadImage('art/start.png');
+  winImg = loadImage('art/win.png');
+  loseImg = loadImage('art/lose.png');
   createCanvas(480, 360);
   angleMode('DEGREES');
   rectMode('CENTER');
@@ -101,7 +107,7 @@ function draw() {
         if (bat.x <= 480) { 
           bat.x += 3;
         } else {
-          bat = {x: 180, y: 140};
+          bat = {x: 240, y: 180};
           state = 'notice';
           transition = false;
           console.log('transition done');
@@ -114,6 +120,9 @@ function draw() {
 
   if (state === 'notice') {
     notice();
+    drawBat(bat.x, bat.y, 255);
+    bat.x += random(-2,2);
+    bat.y += random(-2,2);
   }
 
   if (state === 'bosslvl') {
@@ -122,23 +131,25 @@ function draw() {
     let timeLeft = max(0 , duration - elapsed)
     if (timeLeft <= 0 && bat_count < 12) {
         state = 'game over';
-        return
+       
+  
     } else if (timeLeft <= 0 && bat_count >= 12) {
       state = 'win';
+      
     }
     bossLvl();
     bat.x += random(-2,2);
     bat.y += random(-2,2);
-    fill(144,0,0);
-    text('time:' + timeLeft, 10, 10)
   }
 
   if (state === 'win') {
     win()
+    return
   }
 
   if (state === 'game over') {
     gameOver();
+    return
   }
 }
 
@@ -158,7 +169,7 @@ function start() {
      else {
         stroke(0);
         line(0, y, width, y );
-        background(img);
+        background(startImg);
         y++;
     }
 }
@@ -173,7 +184,9 @@ function intro() {
 function notice() {
   background(0);
   fill(255,0,0);
-  text("the result of the sum of each term, reducing a digit each time from the original four digit number formed by previous levels, in 9s", 10, 10);
+  text("To the original four digit number formed by previous four levels,", bat.x/2, bat.y/2);
+  text("add each term to it   obtained by removing the last digit of the previous term\n starting from the og number", bat.x/2, bat.y/2 + 20);
+  text("we.ve got just 9s", bat.x/2, bat.y/2 + 60);
 }
 
 //levels
@@ -204,22 +217,33 @@ function bossLvl() {
 }
 
 function win() {
-  background(0);
-  text('win', 120, 150);
+  background(winImg);
+  fill(250,0,0);
+  textFont("Georgia");
+  text("Well done, but,  it ain't that easy mate,\n until next time I contact you to recover another fragment.", 120, 250);
 }
 
 function gameOver() {
-  background(0);
-  text('game over', 120, 150);
+  background(loseImg);
+  fill(250,0,0);
+  textSize(16)
+  textFont("Georgia");
+  text('mission holloween: FAILED', 130, 220);
+  
 }
 
 function mousePressed() {
   if (state === 'start' && title_load === true) {
     state = 'intro';
+    const now = Tone.now();
+    synth.triggerAttackRelease("E4", "8n", now);
+    synth.triggerAttackRelease("C4", "8n", now + 0.5);
+    synth.triggerAttackRelease("D4", "8n", now + 1);
   }
 
   else if (state === 'intro') {
     transition = true;
+    synth.triggerAttackRelease("C9", "8n");
   }
 
   else if (state === 'l1') {
@@ -248,6 +272,7 @@ function mousePressed() {
               drawBat(bat.x, bat.y,0);
               break
             case 5:
+              synth.triggerAttackRelease("C3", "8n");
               transition = true;
           }
         
@@ -274,6 +299,7 @@ function mousePressed() {
             drawBat(bat.x, bat.y,0);
             break
           case 4:
+            synth.triggerAttackRelease("B3", "8n");
             transition = true;
         }
       
@@ -300,6 +326,7 @@ function mousePressed() {
               drawBat(bat.x, bat.y,0);
               break
             case 4:
+              synth.triggerAttackRelease("B3", "8n");
               transition = true;
           }
         
@@ -329,6 +356,7 @@ function mousePressed() {
               drawBat(bat.x, bat.y,0);
               break
             case 4:
+              synth.triggerAttackRelease("A3", "8n");
               transition = true;
           }
         
@@ -341,6 +369,7 @@ function mousePressed() {
     state = 'bosslvl';
     bat_count = 0;
     startTime = millis();
+    synth.triggerAttackRelease("B9", "8n");
   }
 
   else if (state === 'bosslvl') {
@@ -350,6 +379,7 @@ function mousePressed() {
         bat_count++;
         drawBat(bat.x , bat.y);
      }
+
 
   }
 }
