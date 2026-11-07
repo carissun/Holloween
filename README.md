@@ -23,5 +23,5 @@ Clue to the final level:
 
 311 + 31 + 3 = 345
 3 + 4 + 5 = 12
-{Click 12 bats within 9s to win}
-{Also, 3110 is the date of Halloween :D}
+- {Click 12 bats within 9s to win}
+- {Also, 3110 is the date of Halloween :D}
